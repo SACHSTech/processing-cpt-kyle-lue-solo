@@ -1,7 +1,12 @@
 import processing.core.PApplet;
 
 public class Sketch extends PApplet {
-	
+	int intPlayerX = 200;
+  int intPlayerY = 350;
+  boolean blnLeft = false;
+  boolean blnRight = false;
+  
+
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -16,21 +21,29 @@ public class Sketch extends PApplet {
    * values here i.e background, stroke, fill etc.
    */
   public void setup() {
-    background(210, 255, 173);
+    background(12, 12, 12);
   }
 
   /**
    * Called repeatedly, anything drawn to the screen goes here
    */
   public void draw() {
-	  
-	// sample code, delete this stuff
-    stroke(128);
-    line(150, 25, 270, 350);  
-
-    stroke(255);
-    line(50, 125, 70, 50);  
+    background(12);
+	   rect(intPlayerX, intPlayerY,20,20);
+    if (blnLeft) {
+      intPlayerX--;
+    }
+    if (blnRight) {
+      intPlayerX++;
+    }
   }
-  
   // define other methods down here.
+  public void keyPressed() {
+    if(keyCode == LEFT){
+      blnLeft = true;
+    }
+    if(keyCode == RIGHT){
+      blnRight = true;
+    }
+  }
 }
