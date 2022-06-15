@@ -32,7 +32,7 @@ public class Sketch extends PApplet {
   PImage SpaceAlienWell;
   PImage LaserBullet;
   PImage Lives; 
-
+  PImage Meteors;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -62,6 +62,8 @@ public class Sketch extends PApplet {
     LaserBullet.resize(35,40);
     Lives = loadImage("Lives.png");
     Lives.resize(10,10);
+    Meteors = loadImage("Meteor.png");
+    Meteors.resize(20,20);
     // Adding the Bullets
     Bullets.add(new PVector(5, 10));
     BulletsHidden.add(false);
@@ -186,6 +188,7 @@ public class Sketch extends PApplet {
     for (int i = 0; i < MeteorY.length; i++) {
       fill(160,160,160);
       ellipse(MeteorX[i], MeteorY[i], 20, 20);
+      image(Meteors,MeteorX[i] - 10,MeteorY[i] - 10);
     // Collision detection
     if(dist((float)intPlayerX,(float)intPlayerY,MeteorX[i],MeteorY[i]) < 20){
       intLives = intLives - 1;
@@ -274,7 +277,7 @@ public class Sketch extends PApplet {
       blnLeft = false;
     }else if (keyCode == RIGHT) {
       blnRight = false;
-    }else if(key == 'c'){
+    }else if(keyCode == 32){
       playerShoot = false;
   }
 }
