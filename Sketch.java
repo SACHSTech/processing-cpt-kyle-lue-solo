@@ -5,6 +5,7 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 public class Sketch extends PApplet {
+  // Variables
 	int intPlayerX = 200;
   int intPlayerY = 350;
   boolean blnLeft = false;
@@ -19,7 +20,9 @@ public class Sketch extends PApplet {
   int intY = 20;
   int intBossMovement = 0;
   int intLives = 3;
-  int intBossHealth = 200;
+  int intBossMaxHealth = 200;
+  int intBossCurrentHealth = 200;
+  float fltHealthPercent;
   boolean blnBossHide = false;
   int intScore = 0;
   int start = 0;
@@ -28,6 +31,7 @@ public class Sketch extends PApplet {
   PImage SpaceAlien;
   PImage SpaceAlienWell;
   PImage LaserBullet;
+  PImage Lives; 
 
 	
   /**
@@ -43,7 +47,9 @@ public class Sketch extends PApplet {
    * values here i.e background, stroke, fill etc.
    */
   public void setup() {
+    // Background
     background(12, 12, 12);
+    // Image resizing and loading
     playerShip = loadImage("SpaceShip.png");
     playerShip.resize(40,40);
     Background = loadImage("Background.jpg");
@@ -54,11 +60,16 @@ public class Sketch extends PApplet {
     SpaceAlienWell.resize(50,50);
     LaserBullet = loadImage("SpaceInvaderBullet.png");
     LaserBullet.resize(35,40);
+    Lives = loadImage("Lives.png");
+    Lives.resize(10,10);
+    // Adding the Bullets
     Bullets.add(new PVector(5, 10));
     BulletsHidden.add(false);
 
+    // Spawning the meteors at a random x and y value
     for (int i = 0; i < MeteorY.length; i++) {
       MeteorY[i] = random(height);
+      MeteorY[i] = MeteorY[i] - 100;
     }
     for (int i = 0; i < MeteorX.length; i++) {
       MeteorX[i] = random(width);
@@ -69,36 +80,41 @@ public class Sketch extends PApplet {
    * Called repeatedly, anything drawn to the screen goes here
    */
   public void draw() {
+    // Title Screen
     if(start == 0){
       title();
     }
+    // Game
     if(start == 1){
       game();
     }
+    // Pause Menu
     if(start == 2){
       pause();
     }
+    // Win Screen
     if(start == 3){
       win();
     }
+    // Lose Screen
     if(start == 4){
       lose();
     }
    }
   // define other methods down here.
-
+   
   public void title(){
     background(Background);
     textSize(40);
     textAlign(CENTER);
     fill(255);
-    text("Space Invaders",100, 110, 190, 150);
-    text("Click to start", 80, 230,240,230);
+    text("Space Invaders",width/2,height/2);
+    text("Click to start",width/2,height/2 + 40);
   }  
 
   public void mouseClicked(){
     start = 1;
-    intBossHealth = 200;
+    intBossCurrentHealth = 200;
     intLives = 3;
   }
   
@@ -135,20 +151,35 @@ public class Sketch extends PApplet {
     if(intPlayerX + 40 > width){
       intPlayerX = width - 40;
     }
+    fill(255);
     textSize(10);
-    text("Boss Health: " + intBossHealth,35,20);
+    text("Boss Health: ",30,10);
+    fill(255);
+    rect(60,0,intBossMaxHealth,10);
+    fill(0,255,0);
+    if(intBossCurrentHealth <= 150){
+      fill(255,255,0);
+    }
+    if(intBossCurrentHealth <= 100){
+      fill(255,128,0);
+    }
+    if(intBossCurrentHealth <= 50){
+      fill(255,0,0);
+    }
+    rect(60,0,intBossCurrentHealth,10);
+
     if(intLives == 3){
       fill(255,0,0);
-      rect(385,5,10 , 10);
-      rect(370, 5, 10, 10);
-      rect(355,5,10,10);
+      image(Lives,385,5);
+      image(Lives,370,5);
+      image(Lives,355,5);
     }else if(intLives == 2){
       fill(255,0,0);
-      rect(385,5,10 , 10);
-      rect(370, 5, 10, 10);
+      image(Lives,385,5);
+      image(Lives,370,5);
     }else if(intLives ==  1){
       fill(255,0,0);
-      rect(385,5,10 , 10);
+      image(Lives,385,5);
     }else if(intLives <= 0){
       start = 4;
     }
@@ -162,6 +193,9 @@ public class Sketch extends PApplet {
     }
       // Controls the speed of the circles falling
       MeteorY[i]+=2;
+      if(intBossCurrentHealth <= 25){
+        MeteorY[i] += 3;
+      }
       // Resets the position of the circles when they hit the bottom 
       if (MeteorY[i] > height) {
         MeteorY[i] = 0;
@@ -185,11 +219,11 @@ public class Sketch extends PApplet {
         if(Bullet.x > intX && Bullet.x < intX + 50 && Bullet.y < intY && Bullet.y > intY - 50){
           blnBossHide = true;
           image(SpaceAlien, intX, intY);
-          intBossHealth -= 2;
+          intBossCurrentHealth -= 2;
           Bullets.remove(i);
           BulletsHidden.remove(i);
         }
-    if(intBossHealth <= 0)
+    if(intBossCurrentHealth <= 0)
       start = 3;
   }
 }
@@ -199,23 +233,24 @@ public class Sketch extends PApplet {
     textAlign(CENTER);
     textSize(40);
     fill(255);
-    text("PAUSED", 140,150,170,180);
-    text("Press q to unpause",150,190,180,230);
+    text("PAUSED", width/2,height/2);
+    text("Press q to unpause",width/2,height/2 + 40);
   }
   public void win(){
     background(Background);
     textAlign(CENTER);
     textSize(40);
     fill(255);
-    text("You Win", 140,150,170,180);
-    text("Click to restart", 140,190,170,230);
+    text("You Win", width/2,height/2);
+    text("Click to restart",width/2, height/2 + 40);
   }
   public void lose(){
     background(Background);
     textAlign(CENTER);
     textSize(40);
     fill(255);
-    text("Game Over", 100,150,170,180);
+    text("Game Over", width/2, height/2);
+    text("Click to restart",width/2, height/2 + 40);
   }
   public void keyPressed() {
     if(keyCode == LEFT){
