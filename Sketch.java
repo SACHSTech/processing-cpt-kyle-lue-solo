@@ -1,8 +1,5 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
-import javax.xml.datatype.DatatypeConstants.Field;
-
+import java.util.Random;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -14,17 +11,23 @@ public class Sketch extends PApplet {
   boolean blnRight = false;
   boolean playerShoot =false;
   ArrayList <PVector> Bullets = new ArrayList<PVector>();
-  ArrayList <PVector> AlienField = new ArrayList<PVector>();
-  int[][] Field = new int[10][3];
-  int intRowCount = 10;
-  int intColumnCount = 4;
-  int intX = 0;
-  int intY = 0;
+  ArrayList <Boolean> BulletsHidden = new ArrayList<Boolean>();
+  float[] MeteorY = new float[15];
+  float[] MeteorX = new float[15];
+  int MeteorRadius = 25;
+  int intX = 200;
+  int intY = 20;
+  int intBossMovement = 0;
+  int intLives = 3;
+  int intBossHealth = 200;
+  boolean blnBossHide = false;
   int intScore = 0;
   int start = 0;
   PImage playerShip;
   PImage Background;
   PImage SpaceAlien;
+  PImage SpaceAlienWell;
+  PImage LaserBullet;
 
 	
   /**
@@ -45,10 +48,21 @@ public class Sketch extends PApplet {
     playerShip.resize(40,40);
     Background = loadImage("Background.jpg");
     Background.resize(400,400);
-    SpaceAlien = loadImage("Alien.png");
-    SpaceAlien.resize(20,20);
-    Bullets.add(new PVector(10, 10));
-    AlienField.add(new PVector(20,20));
+    SpaceAlien = loadImage("SpaceAlien.png");
+    SpaceAlien.resize(50,50);
+    SpaceAlienWell = loadImage("SpaceAlienWell.png");
+    SpaceAlienWell.resize(50,50);
+    LaserBullet = loadImage("SpaceInvaderBullet.png");
+    LaserBullet.resize(35,40);
+    Bullets.add(new PVector(5, 10));
+    BulletsHidden.add(false);
+
+    for (int i = 0; i < MeteorY.length; i++) {
+      MeteorY[i] = random(height);
+    }
+    for (int i = 0; i < MeteorX.length; i++) {
+      MeteorX[i] = random(width);
+    }
   }
 
   /**
@@ -64,6 +78,12 @@ public class Sketch extends PApplet {
     if(start == 2){
       pause();
     }
+    if(start == 3){
+      win();
+    }
+    if(start == 4){
+      lose();
+    }
    }
   // define other methods down here.
 
@@ -78,17 +98,36 @@ public class Sketch extends PApplet {
 
   public void mouseClicked(){
     start = 1;
+    intBossHealth = 200;
+    intLives = 3;
   }
   
   public void game(){
   background(Background);
-	   rect(intPlayerX, intPlayerY,40,40);
-     image(playerShip,intPlayerX,intPlayerY);
+  Random random = new Random();
+  int randomNumber = random.nextInt(400);
+  if(intX < 0){
+    intBossMovement = 0;
+  }
+  if(intX +50 > width){
+    intBossMovement = 1;
+  }
+  if(intBossMovement == 0){
+    intX += 2;
+  }
+  if(intBossMovement == 1){
+    intX -= 2;
+  }
+  blnBossHide = false;
+  if(blnBossHide == false){
+    image(SpaceAlienWell, intX, intY);
+  }
+  image(playerShip,intPlayerX,intPlayerY);
     if (blnLeft) {
-      intPlayerX-=2;
+      intPlayerX-=3;
     }
     if (blnRight) {
-      intPlayerX+=2;
+      intPlayerX+=3;
     }
     if(intPlayerX < 0){
       intPlayerX = 0;
@@ -96,29 +135,64 @@ public class Sketch extends PApplet {
     if(intPlayerX + 40 > width){
       intPlayerX = width - 40;
     }
-    for(int intRow = 0; intRow < intRowCount; intRow++){
-      for(int intColumn = 0; intColumn < intColumnCount; intColumnCount++){
-        int intX = 25 * intRow;
-        int intY = 25 * intColumn;
-        rect(intX,intY,20,20);
-        image(SpaceAlien,20,20);
-        for(int i = 0; i < Bullets.size(); i++) {
-          PVector Bullet = Bullets.get(i);
-          Bullet.y -=2;
-          ellipse(Bullet.x, Bullet.y, 5, 10);
-          if(Bullet.y < 0){
-            Bullets.remove(i);
-          }
-          if(Bullet.x > intX && Bullet.x + 20 < intX + 20 && Bullet.y < intY){
-            Field[intRow][intColumn] = 0;
-            intScore = intScore + 200;
-          }
+    textSize(10);
+    text("Boss Health: " + intBossHealth,35,20);
+    if(intLives == 3){
+      fill(255,0,0);
+      rect(385,5,10 , 10);
+      rect(370, 5, 10, 10);
+      rect(355,5,10,10);
+    }else if(intLives == 2){
+      fill(255,0,0);
+      rect(385,5,10 , 10);
+      rect(370, 5, 10, 10);
+    }else if(intLives ==  1){
+      fill(255,0,0);
+      rect(385,5,10 , 10);
+    }else if(intLives <= 0){
+      start = 4;
     }
+    for (int i = 0; i < MeteorY.length; i++) {
+      fill(160,160,160);
+      ellipse(MeteorX[i], MeteorY[i], 20, 20);
+    // Collision detection
+    if(dist((float)intPlayerX,(float)intPlayerY,MeteorX[i],MeteorY[i]) < 20){
+      intLives = intLives - 1;
+      MeteorY[i] = 0;
     }
+      // Controls the speed of the circles falling
+      MeteorY[i]+=2;
+      // Resets the position of the circles when they hit the bottom 
+      if (MeteorY[i] > height) {
+        MeteorY[i] = 0;
+        MeteorX[i] = randomNumber;
+      }
+      if(MeteorX[i] > width){
+        MeteorX[i] = 0;
+      }
+    }
+      for(int i = 0; i < Bullets.size(); i++) {
+        PVector Bullet = Bullets.get(i);
+        BulletsHidden.get(i);
+        Bullet.y -= 4 ;
+        fill(255);
+        if(BulletsHidden.get(i) == false){
+          image(LaserBullet,Bullet.x,Bullet.y);
+        }
+        if(Bullet.y < 0){
+          Bullets.remove(i);
+        }
+        if(Bullet.x > intX && Bullet.x < intX + 50 && Bullet.y < intY && Bullet.y > intY - 50){
+          blnBossHide = true;
+          image(SpaceAlien, intX, intY);
+          intBossHealth -= 2;
+          Bullets.remove(i);
+          BulletsHidden.remove(i);
+        }
+    if(intBossHealth <= 0)
+      start = 3;
   }
-  }
-  //}
-
+}
 
   public void pause(){
     background(Background);
@@ -128,14 +202,30 @@ public class Sketch extends PApplet {
     text("PAUSED", 140,150,170,180);
     text("Press q to unpause",150,190,180,230);
   }
+  public void win(){
+    background(Background);
+    textAlign(CENTER);
+    textSize(40);
+    fill(255);
+    text("You Win", 140,150,170,180);
+    text("Click to restart", 140,190,170,230);
+  }
+  public void lose(){
+    background(Background);
+    textAlign(CENTER);
+    textSize(40);
+    fill(255);
+    text("Game Over", 100,150,170,180);
+  }
   public void keyPressed() {
     if(keyCode == LEFT){
       blnLeft = true;
     }else if(keyCode == RIGHT){
       blnRight = true;
-    }else if(key == 'c'){
+    }else if(keyCode == 32){
       playerShoot = true;
-      Bullets.add(new PVector(intPlayerX + 20, intPlayerY));
+      Bullets.add(new PVector(intPlayerX + 10, intPlayerY));
+      BulletsHidden.add(false);
     }else if(key == 'p'){
       start = 2;
     }else if(key == 's'){
@@ -153,16 +243,4 @@ public class Sketch extends PApplet {
       playerShoot = false;
   }
 }
-
 }
-//for(int c = 0; c < AlienField.size(); c++){
-      //PVector Alien = AlienField.get(c);
-      //Alien.y += 0.01;
-      //for(int intRow = 0; intRow < intRowCount; intRow++){
-        //for(int intColumn = 0; intColumn < intColumnCount; intColumn++){
-          //float x = Alien.x +5;
-          //float y = Alien.y +5;
-          //rect(x, y,20,20);
-         // image(SpaceAlien,x,y);
-       // }
-      //}
