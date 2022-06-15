@@ -15,7 +15,6 @@ public class Sketch extends PApplet {
   ArrayList <Boolean> BulletsHidden = new ArrayList<Boolean>();
   float[] MeteorY = new float[15];
   float[] MeteorX = new float[15];
-  int MeteorRadius = 25;
   int intX = 200;
   int intY = 20;
   int intBossMovement = 0;
@@ -33,6 +32,7 @@ public class Sketch extends PApplet {
   PImage LaserBullet;
   PImage Lives; 
   PImage Meteors;
+  PImage MeteorFire;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -64,6 +64,8 @@ public class Sketch extends PApplet {
     Lives.resize(10,10);
     Meteors = loadImage("Meteor.png");
     Meteors.resize(20,20);
+    MeteorFire = loadImage("MeteorFire.png");
+    MeteorFire.resize(20,25);
     // Adding the Bullets
     Bullets.add(new PVector(5, 10));
     BulletsHidden.add(false);
@@ -104,7 +106,9 @@ public class Sketch extends PApplet {
     }
    }
   // define other methods down here.
-   
+   /**
+    * This method is used for creating the title screen
+    */
   public void title(){
     background(Background);
     textSize(40);
@@ -113,17 +117,24 @@ public class Sketch extends PApplet {
     text("Space Invaders",width/2,height/2);
     text("Click to start",width/2,height/2 + 40);
   }  
-
+  /**
+   * This method is used for registering the mouse clicks and progressing the different screens 
+   */
   public void mouseClicked(){
     start = 1;
     intBossCurrentHealth = intBossMaxHealth;
     intLives = 3;
   }
-  
+  /**
+   * This method is used for the game and its code 
+   */
   public void game(){
+  // Background
   background(Background);
+  // Random number generator 
   Random random = new Random();
   int randomNumber = random.nextInt(400);
+  // Boss Movement
   if(intX < 0){
     intBossMovement = 0;
   }
@@ -140,6 +151,7 @@ public class Sketch extends PApplet {
   if(blnBossHide == false){
     image(SpaceAlienWell, intX, intY);
   }
+  // Player Movement
   image(playerShip,intPlayerX,intPlayerY);
     if (blnLeft) {
       intPlayerX-=3;
@@ -153,6 +165,7 @@ public class Sketch extends PApplet {
     if(intPlayerX + 40 > width){
       intPlayerX = width - 40;
     }
+    // Boss Health and Health Bar
     fill(255);
     textSize(10);
     text("Boss Health: ",35,10);
@@ -169,7 +182,7 @@ public class Sketch extends PApplet {
       fill(255,0,0);
     }
     rect(60,0,intBossCurrentHealth,10);
-
+    // Life System
     if(intLives == 3){
       fill(255,0,0);
       image(Lives,385,5);
@@ -185,10 +198,12 @@ public class Sketch extends PApplet {
     }else if(intLives <= 0){
       start = 4;
     }
+    // Spawns the meteors
     for (int i = 0; i < MeteorY.length; i++) {
       fill(160,160,160);
       ellipse(MeteorX[i], MeteorY[i], 20, 20);
       image(Meteors,MeteorX[i] - 10,MeteorY[i] - 10);
+      image(MeteorFire,MeteorX[i] - 10, MeteorY[i] - 30);
     // Collision detection
     if(dist((float)intPlayerX,(float)intPlayerY,MeteorX[i],MeteorY[i]) < 20){
       intLives = intLives - 1;
@@ -208,6 +223,7 @@ public class Sketch extends PApplet {
         MeteorX[i] = 0;
       }
     }
+    // Spawns the bullets
       for(int i = 0; i < Bullets.size(); i++) {
         PVector Bullet = Bullets.get(i);
         BulletsHidden.get(i);
@@ -216,9 +232,11 @@ public class Sketch extends PApplet {
         if(BulletsHidden.get(i) == false){
           image(LaserBullet,Bullet.x,Bullet.y);
         }
+        // REmoves bullets when they reach the top of the screen
         if(Bullet.y < 0){
           Bullets.remove(i);
         }
+        // Boss collision detection
         if(Bullet.x > intX && Bullet.x < intX + 50 && Bullet.y < intY && Bullet.y > intY - 50){
           blnBossHide = true;
           image(SpaceAlien, intX, intY);
@@ -226,11 +244,14 @@ public class Sketch extends PApplet {
           Bullets.remove(i);
           BulletsHidden.remove(i);
         }
+    // Win 
     if(intBossCurrentHealth <= 0)
       start = 3;
   }
 }
-
+  /**
+   * This method is used for the pause screen
+   */
   public void pause(){
     background(Background);
     textAlign(CENTER);
@@ -239,6 +260,9 @@ public class Sketch extends PApplet {
     text("PAUSED", width/2,height/2);
     text("Press q to unpause",width/2,height/2 + 40);
   }
+  /**
+   * This method is used for the win screen
+   */
   public void win(){
     background(Background);
     textAlign(CENTER);
@@ -247,6 +271,9 @@ public class Sketch extends PApplet {
     text("You Win", width/2,height/2);
     text("Click to restart",width/2, height/2 + 40);
   }
+  /**
+   * This method is used for the losing screen
+   */
   public void lose(){
     background(Background);
     textAlign(CENTER);
@@ -255,6 +282,9 @@ public class Sketch extends PApplet {
     text("Game Over", width/2, height/2);
     text("Click to restart",width/2, height/2 + 40);
   }
+  /**
+   * This method registers the key presses
+   */
   public void keyPressed() {
     if(keyCode == LEFT){
       blnLeft = true;
@@ -272,6 +302,9 @@ public class Sketch extends PApplet {
       start = 1;
     }
   }
+  /**
+   * This method registes the key released
+   */
   public void keyReleased() {
     if (keyCode == LEFT) {
       blnLeft = false;
