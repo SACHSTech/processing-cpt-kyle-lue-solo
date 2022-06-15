@@ -224,7 +224,7 @@ public class Sketch extends PApplet {
       blnRight = true;
     }else if(keyCode == 32){
       playerShoot = true;
-      Bullets.add(new PVector(intPlayerX + 10, intPlayerY));
+      Bullets.add(new PVector(intPlayerX + 3, intPlayerY));
       BulletsHidden.add(false);
     }else if(key == 'p'){
       start = 2;
