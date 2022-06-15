@@ -116,7 +116,7 @@ public class Sketch extends PApplet {
 
   public void mouseClicked(){
     start = 1;
-    intBossCurrentHealth = 200;
+    intBossCurrentHealth = intBossMaxHealth;
     intLives = 3;
   }
   
@@ -155,17 +155,17 @@ public class Sketch extends PApplet {
     }
     fill(255);
     textSize(10);
-    text("Boss Health: ",30,10);
+    text("Boss Health: ",35,10);
     fill(255);
     rect(60,0,intBossMaxHealth,10);
     fill(0,255,0);
-    if(intBossCurrentHealth <= 150){
+    if(intBossCurrentHealth <= intBossMaxHealth*0.75){
       fill(255,255,0);
     }
-    if(intBossCurrentHealth <= 100){
+    if(intBossCurrentHealth <= intBossMaxHealth/2){
       fill(255,128,0);
     }
-    if(intBossCurrentHealth <= 50){
+    if(intBossCurrentHealth <= intBossMaxHealth*0.25){
       fill(255,0,0);
     }
     rect(60,0,intBossCurrentHealth,10);
@@ -197,7 +197,7 @@ public class Sketch extends PApplet {
       // Controls the speed of the circles falling
       MeteorY[i]+=2;
       if(intBossCurrentHealth <= 25){
-        MeteorY[i] += 3;
+        MeteorY[i] += 2.5;
       }
       // Resets the position of the circles when they hit the bottom 
       if (MeteorY[i] > height) {
