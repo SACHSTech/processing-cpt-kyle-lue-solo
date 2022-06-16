@@ -73,7 +73,7 @@ public class Sketch extends PApplet {
     // Spawning the meteors at a random x and y value
     for (int i = 0; i < MeteorY.length; i++) {
       MeteorY[i] = random(height);
-      MeteorY[i] = MeteorY[i] - 100;
+      MeteorY[i] = MeteorY[i] - 50;
     }
     for (int i = 0; i < MeteorX.length; i++) {
       MeteorX[i] = random(width);
@@ -211,7 +211,7 @@ public class Sketch extends PApplet {
     }
       // Controls the speed of the circles falling
       MeteorY[i]+=2;
-      if(intBossCurrentHealth <= 25){
+      if(intBossCurrentHealth <= intBossMaxHealth*0.25){
         MeteorY[i] += 2.5;
       }
       // Resets the position of the circles when they hit the bottom 

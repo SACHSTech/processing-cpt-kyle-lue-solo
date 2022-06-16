@@ -3,7 +3,7 @@
 Controls:
 Left Arrow to move left
 Right Arrow to move right
-C to shoot 
+Space to shoot 
 P to pause
 
-In this game, the objective is to shoot the alien boss and dodge the meteors that fly at you.  You have three lives and whenever a meteor hits you, you lose one life. The boss' health bar is in the top left corner and you need to shoot the boss in order to deplete its health.
+In this game, the objective is to shoot the alien boss and dodge the meteors that fly at you.  You have three lives and whenever a meteor hits you, you lose one life. The boss' health bar is in the top left corner and you need to shoot the boss in order to deplete its health. When the boss's health gets below 25%, the meteors speed up. If you deplete all the boss' health, you win and if you lose all your live, you lose. 
